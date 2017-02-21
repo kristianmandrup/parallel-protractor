@@ -3,10 +3,11 @@
 const debug = require('debug')('parallel')
 const path = require('path')
 const vm = require('vm')
-const confFilename = path.resolve('./conf.js')
-const suiteName = 'one'
-console.log('parallelizing, assuming conf file\n%s\nsuite name "%s"',
-  confFilename, suiteName, +new Date())
+let confFilename = path.resolve('./conf.js')
+let confFilenameAlt = path.resolve(process.env.PROTRACTOR_CONFIG_PATH || './protractor.conf.js')
+const suiteName = process.env.SUITE || 'one'
+console.log('parallelizing, assuming conf file\n%s or %s\nsuite name "%s"',
+  confFilename, confFilenameAlt, suiteName, +new Date())
 
 const Module = require('module')
 const __resolveFilename = Module._resolveFilename
@@ -46,7 +47,15 @@ Module._load = function (filename, parent) {
 
 const fs = require('fs')
 const _readFileSync = fs.readFileSync
-const conf = fs.readFileSync(confFilename, 'utf8')
+
+// also try using protractor.conf.js
+let conf = null
+try {
+  conf = fs.readFileSync(confFilename, 'utf8')
+} catch (e) {
+  conf = fs.readFileSync(confFilenameAlt, 'utf8')
+}
+
 const config = eval(conf) // eslint-disable-line no-eval
 const specFilename = path.resolve(config.suites[suiteName])
 debug('spec "%s" filename from conf', suiteName, specFilename)

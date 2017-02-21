@@ -34,10 +34,42 @@ first
 }
 ```
 
+If `conf.js` is not present it will try using `protractor.conf.js`
+
+By default the script assumes a suite called `one`. You can override this default by specifying a `SUITE` environment variable.
+
+You may also specify a `PROTRACTOR_CONFIG_PATH` environment variable to point to a specific Protractor config file.
+
+## Sample config
+
+```
+exports.config = {
+  framework: 'mocha',
+  seleniumAddress: 'http://localhost:4444/wd/hub',
+  suites: {
+    one: 'spec.js' // all tests in single file
+  },
+  suite: 'one', // default suite to run
+  mochaOpts: {
+    ui: 'bdd',
+    reporter: 'spec',
+    slow: 5000
+  },
+  capabilities: {
+    browserName: 'firefox', // chrome
+    shardTestFiles: true,
+    maxInstances: 2
+  }
+}
+```
+
+## Test
+
+See the `/test/one` folder for a full usage example.
+
 ## Why?
 
-If you have a large file with long running end to end tests, you can refactor the long file 
-into the smaller separate physical files. The you can 
+If you have a large file with long running end to end tests, you can refactor the long file into the smaller separate physical files. The you can 
 [configure parallel tests](http://blog.yodersolutions.com/run-protractor-tests-in-parallel/).
 Or you can just create "virtual" spec files on the fly using `parallel-protractor`! It overrides
 the Node `require` function called from Protractor and tells it that there is a file for each
